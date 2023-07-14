@@ -77,4 +77,102 @@ public class board : MonoBehaviour
         }
         return false;
     }
+
+    private void destoymatchesat(int column, int row)
+    {
+        if (alldots[column, row].GetComponent<dot>().ismatched)
+        {
+            Destroy(alldots[column, row]);
+            alldots[column, row] = null;
+        }
+    }
+
+    public void destroymatches()
+    {
+        for(int i = 0; i<width;i++)
+        {
+            for(int j = 0; j < height; j++)
+            {
+                if (alldots[i, j] != null)
+                {
+                    destoymatchesat(i, j);
+
+                }
+            }
+        }
+        StartCoroutine(decreaserowco());
+    }
+
+    private IEnumerator decreaserowco()
+    {
+        int nullcount = 0;
+        for (int i = 0; i< width; i++)
+        {
+            for(int j = 0; j < height; j++)
+            {
+                if (alldots[i, j] == null)
+                {
+                    nullcount++;
+                }else if (nullcount > 0)
+                {
+                    alldots[i, j].GetComponent<dot>().row -= nullcount;
+                    alldots[i, j] = null;
+                }
+            }
+            nullcount = 0;
+
+        }
+        yield return new WaitForSeconds(.4f);
+        StartCoroutine(fillboardco());
+    }
+
+    private void refillboard()
+    {
+        for(int i = 0; i < width; i++)
+        {
+            for(int j = 0; j < height; j++)
+            {
+                if (alldots[i, j] == null)
+                {
+                    Vector2 tempposition = new Vector2(i, j);
+                    int dottouse = Random.Range(0, dots.Length);
+                    GameObject piece = Instantiate(dots[dottouse], tempposition, Quaternion.identity);
+                    alldots[i, j] = piece;
+
+                }
+            }
+        }
+    }
+    private bool matchesonboard()
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                if (alldots[i, j] != null)
+                {
+                    if (alldots[i, j].GetComponent<dot>().ismatched)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+                
+        return false;
+
+    }
+
+    private IEnumerator fillboardco()
+    {
+        refillboard();
+        yield return new WaitForSeconds(.5f);
+
+        while (matchesonboard())
+        {
+            yield return new WaitForSeconds(.5f);
+            destroymatches();
+        }
+    }
+
 }

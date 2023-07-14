@@ -48,25 +48,31 @@ public class dot : MonoBehaviour
         if(Mathf.Abs(targetx - transform.position.x) > .1)
         {
             tempposition = new Vector2(targetx, transform.position.y);
-            transform.position = Vector2.Lerp(transform.position, tempposition, .4f);
-
+            transform.position = Vector2.Lerp(transform.position, tempposition, .6f);
+            if (board1.alldots[column, row] != this.gameObject)
+            {
+                board1.alldots[column, row] = this.gameObject;
+            }
         }
         else {
             tempposition = new Vector2(targetx, transform.position.y);
             transform.position = tempposition;
-            board1.alldots[column, row] = this.gameObject;
+           
         }
         if (Mathf.Abs(targety - transform.position.y) > .1)
         {
             tempposition = new Vector2(transform.position.x, targety);
-            transform.position = Vector2.Lerp(transform.position, tempposition, .4f);
-
+            transform.position = Vector2.Lerp(transform.position, tempposition, .6f);
+            if (board1.alldots[column, row] != this.gameObject)
+            {
+                board1.alldots[column, row] = this.gameObject;
+            }
         }
         else
         {
             tempposition = new Vector2(transform.position.x, targety);
             transform.position = tempposition;
-            board1.alldots[column, row] = this.gameObject;
+       
         }
 
     }
@@ -83,9 +89,13 @@ public class dot : MonoBehaviour
                 row = previousrow;
                 column = previouscolumn;
             }
+            else
+            {
+                board1.destroymatches();
+            }
             otherdot = null;
-
         }
+        
     }
 
     private void OnMouseDown()
