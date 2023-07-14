@@ -18,9 +18,14 @@ public class board : MonoBehaviour
     public GameObject[] dots;
     private backgroundtile[,] alltiles;
     public GameObject[,] alldots;
+    private scoremanager scoremanager1;
+    public int basepiecevalue = 5;
+    private int streakvalue = 1;
+
     // Start is called before the first frame update
     void Start()
     {
+        scoremanager1 = FindObjectOfType<scoremanager>();
         findmatches1 = FindObjectOfType<findmatches>();
         alltiles = new backgroundtile[width, height];
         alldots = new GameObject[width, height];
@@ -93,8 +98,8 @@ public class board : MonoBehaviour
         {
             findmatches1.currentmatches.Remove(alldots[column, row]);
             Destroy(alldots[column, row]);
+            scoremanager1.increasescore(basepiecevalue*streakvalue);
             alldots[column, row] = null;
-
         }
     }
 
@@ -181,6 +186,7 @@ public class board : MonoBehaviour
 
         while (matchesonboard())
         {
+            streakvalue += 1;
             yield return new WaitForSeconds(.5f);
             destroymatches();
         }
@@ -191,6 +197,7 @@ public class board : MonoBehaviour
             Debug.Log("deadlocked");
         }
         currentstate = gamestate.move;
+        streakvalue = 1;
     }
 
     private void switchpieces(int column, int row, Vector2 direction)
@@ -274,4 +281,26 @@ public class board : MonoBehaviour
         }
         return true;
     }
+    /*private void shuffleboard()
+    {
+        List<GameObject> newboard = new List<GameObject>();
+        for(int i = 0; i < width; i++)
+        {
+            for(int j = 0; j < height; j++)
+            {
+                if (alldots[i, j] != null)
+                {
+                    newboard.Add(alldots[i, j]);
+                }
+            }
+        }
+        for(int i = 0; i < width; i++)
+        {
+            for(int j = 0; j < height; j++)
+            {
+                if(!blankSpaces[])
+            }
+        }
+
+    }*/
 }
