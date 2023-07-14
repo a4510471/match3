@@ -2,8 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum gamestate
+{
+    wait,
+    move
+}
+
 public class board : MonoBehaviour
 {
+    private findmatches findmatches1;
+    public gamestate currentstate = gamestate.move;
     public int width;
     public int height;
     public GameObject tileprefab;
@@ -13,6 +21,7 @@ public class board : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        findmatches1 = FindObjectOfType<findmatches>();
         alltiles = new backgroundtile[width, height];
         alldots = new GameObject[width, height];
         setup();
@@ -82,8 +91,10 @@ public class board : MonoBehaviour
     {
         if (alldots[column, row].GetComponent<dot>().ismatched)
         {
+            findmatches1.currentmatches.Remove(alldots[column, row]);
             Destroy(alldots[column, row]);
             alldots[column, row] = null;
+
         }
     }
 
@@ -173,6 +184,94 @@ public class board : MonoBehaviour
             yield return new WaitForSeconds(.5f);
             destroymatches();
         }
+        yield return new WaitForSeconds(.5f);
+
+        if (isdeadlocked())
+        {
+            Debug.Log("deadlocked");
+        }
+        currentstate = gamestate.move;
     }
 
+    private void switchpieces(int column, int row, Vector2 direction)
+    {
+        GameObject holder = alldots[column +(int)direction.x, row + (int)direction.y] as GameObject;
+        alldots[column + (int)direction.x, row + (int)direction.y] = alldots[column, row];
+        alldots[column, row] = holder;
+
+    }
+    private bool checkformatches()
+    {
+        for(int i =0;i<width;i++)
+           {
+            for (int j = 0; j < height; j++)
+            {
+                if (alldots[i, j] != null)
+                {
+                    if (i < width - 2)
+                    {
+                        if (alldots[i + 1, j] != null && alldots[i + 2, j] != null)
+                        {
+                            if (alldots[i + 1, j].tag == alldots[i, j].tag && alldots[i + 2, j].tag == alldots[i, j].tag)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    if (j < height - 2)
+                    {
+                        if (alldots[i, j + 1] != null && alldots[i, j + 2] != null)
+                        {
+                            if (alldots[i, j + 1].tag == alldots[i, j].tag && alldots[i, j + 2].tag == alldots[i, j].tag)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private bool switchandcheck(int column,int row, Vector2 direction)
+    {
+        switchpieces(column, row, direction);
+        if(checkformatches())
+        {
+            switchpieces(column, row, direction);
+            return true;
+        }
+        switchpieces(column, row, direction);
+        return false;
+    }
+
+    private bool isdeadlocked()
+    {
+        for(int i = 0; i < width; i++)
+        {
+            for(int j=0;j< height;j++)
+             {
+                if(alldots[i,j]!=null)
+                {
+                    if (i < width - 1)
+                    {
+                        if(switchandcheck(i, j, Vector2.right))
+                        {
+                            return false;
+                        }
+                    }
+                    if(j< height - 1)
+                    {
+                        if (switchandcheck(i, j, Vector2.up))
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+            }
+        }
+        return true;
+    }
 }

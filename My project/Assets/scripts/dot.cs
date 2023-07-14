@@ -13,7 +13,7 @@ public class dot : MonoBehaviour
     public int targety;
     public bool ismatched = false;
 
-
+    private findmatches findmatches1;
     private GameObject otherdot;
     private board board1;
     private Vector2 firsttouchposition;
@@ -25,6 +25,7 @@ public class dot : MonoBehaviour
     void Start()
     {
         board1 = FindObjectOfType<board>();
+        findmatches1 = FindObjectOfType<findmatches>();
         targetx = (int)transform.position.x;
         targety = (int)transform.position.y;
         row = targety;
@@ -37,7 +38,7 @@ public class dot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        findmathes();
+        //findmathes();
         if (ismatched)
         {
             SpriteRenderer mysprite = GetComponent<SpriteRenderer>();
@@ -53,6 +54,7 @@ public class dot : MonoBehaviour
             {
                 board1.alldots[column, row] = this.gameObject;
             }
+            findmatches1.findallmatches();
         }
         else {
             tempposition = new Vector2(targetx, transform.position.y);
@@ -67,6 +69,7 @@ public class dot : MonoBehaviour
             {
                 board1.alldots[column, row] = this.gameObject;
             }
+            findmatches1.findallmatches();
         }
         else
         {
@@ -88,10 +91,13 @@ public class dot : MonoBehaviour
                 otherdot.GetComponent<dot>().column = column;
                 row = previousrow;
                 column = previouscolumn;
+                yield return new WaitForSeconds(.5f);
+                board1.currentstate = gamestate.move;
             }
             else
             {
                 board1.destroymatches();
+                
             }
             otherdot = null;
         }
@@ -100,14 +106,20 @@ public class dot : MonoBehaviour
 
     private void OnMouseDown()
     {
-        firsttouchposition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //Debug.Log(firsttouchposition);
+        if (board1.currentstate == gamestate.move)
+        {
+            firsttouchposition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
+            //Debug.Log(firsttouchposition);
 
     }
 
     private void OnMouseUp()
     {
-        finaltouchposition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (board1.currentstate == gamestate.move)
+        {
+            finaltouchposition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        } 
         calculateangle();
     }
 
@@ -117,7 +129,11 @@ public class dot : MonoBehaviour
         { 
             swipeangle = Mathf.Atan2(finaltouchposition.y - firsttouchposition.y, finaltouchposition.x - firsttouchposition.x) * 180 / Mathf.PI;
         //Debug.Log(swipeangle);
-        movepiecies();
+            movepiecies();
+            board1.currentstate = gamestate.wait;
+        }
+        else{
+            board1.currentstate = gamestate.move;
         }
     }
 
