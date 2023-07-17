@@ -7,6 +7,22 @@ public class menuscript : MonoBehaviour
 {
     public void playgame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene(1);
+    }
+
+    public void  quitgame()
+    {
+        Debug.Log("Exit");
+        Application.Quit();
+    }
+
+    public void records()
+    {
+        Debug.Log("Poka ne rabotaet :(");
+    }
+
+    public void goback()
+    {
+        SceneManager.LoadScene(0);
     }
 }
